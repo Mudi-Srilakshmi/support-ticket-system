@@ -1,7 +1,16 @@
-venv/
+# Python
 __pycache__/
 *.pyc
-db.sqlite3
+
+# Environment
 .env
-.DS_Store
+venv/
+
+# Database
+db.sqlite3
+
+# Static files
+staticfiles/
+
+# Docker
 *.log

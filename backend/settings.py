@@ -33,7 +33,7 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
 
-    # Local
+    # Local apps
     'tickets',
 ]
 
@@ -43,6 +43,10 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+
+    # Needed for static files (IMPORTANT)
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -52,7 +56,7 @@ MIDDLEWARE = [
 ]
 
 # -------------------------
-# CORS
+# CORS SETTINGS
 # -------------------------
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -93,7 +97,7 @@ DATABASES = {
         'NAME': os.getenv("DB_NAME", "support_db"),
         'USER': os.getenv("DB_USER", "postgres"),
         'PASSWORD': os.getenv("DB_PASSWORD", "postgres"),
-        'HOST': os.getenv("DB_HOST", "db"),  # docker service name
+        'HOST': os.getenv("DB_HOST", "db"),  # Docker service name
         'PORT': os.getenv("DB_PORT", "5432"),
     }
 }
@@ -120,19 +124,24 @@ AUTH_PASSWORD_VALIDATORS = [
 # INTERNATIONALIZATION
 # -------------------------
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 USE_TZ = True
 
 # -------------------------
-# STATIC FILES
+# STATIC FILES (IMPORTANT FIX)
 # -------------------------
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+
+# Where collectstatic stores files
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# WhiteNoise (serve static in Docker)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # -------------------------
-# DEFAULT PK
+# DEFAULT PRIMARY KEY
 # -------------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -140,9 +149,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # DRF CONFIG
 # -------------------------
 REST_FRAMEWORK = {
+
+    # Filtering
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
+
+    # Pagination
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
 }
